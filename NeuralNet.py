@@ -122,7 +122,8 @@ class NeuralNet:
             #contains probabilities of either 0 or 1 occuring
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
                     
-            differences = []
+            beta_error = []
+            beta_other_nodes = []
             #generating difference matrix
             for i in range(len(X)):
                 #backward propagation:
@@ -130,16 +131,27 @@ class NeuralNet:
                     one_hot_y = np.array([1,0])
                 elif int(y[i]) == 1:
                     one_hot_y = np.array([0,1])
-                    
-                difference = softmax_scores[i] - one_hot_y
                 
-                differences.append(difference)
+                # calculate the error: beta = desired - output
+                beta_z = one_hot_y - softmax_scores[i]
+                
+                # calculate for all other nodes: beta_j = output * (1- output)*beta_z
+                beta_j = self.epsilon * softmax_scores[i] * (1-softmax_scores[i]) * beta_z
+                    
+                beta_error.append(beta_z)
+                beta_other_nodes.append(beta_j)
+                #differences.append(beta_z)
+            
+            print("beta error: " + str(beta_error))
+            print("beta_other_nodes: " + str(beta_other_nodes))
+            
+            self.theta += np.dot(np.transpose(softmax_scores), beta_other_nodes)
+            
+            print(self.theta)
             
             gradient_wrt_weight = np.dot(np.transpose(X), differences)
             gradient_wrt_bias = np.dot(np.transpose(np.ones((len(X), 1))), differences)
             
-            #w = w - learning_rate * gradient of cost w.r.t weights
-            self.theta = self.theta - self.epsilon * gradient_wrt_weight
             self.theta_hidden = self.theta_hidden - self.epsilon * gradient_wrt_weight
             
             #b = b - learning_rate * gradient of cost w.r.t. biases
