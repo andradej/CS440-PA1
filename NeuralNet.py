@@ -140,9 +140,11 @@ class NeuralNet:
             
             #w = w - learning_rate * gradient of cost w.r.t weights
             self.theta = self.theta - self.epsilon * gradient_wrt_weight
+            self.theta_hidden = self.theta_hidden - self.epsilon * gradient_wrt_weight
             
             #b = b - learning_rate * gradient of cost w.r.t. biases
             self.bias = self.bias - self.epsilon * gradient_wrt_bias
+            self.bias_hidden = self.bias_hidden - self.epsilon * gradient_wrt_bias
             
             prev_cost = current_cost
             current_cost = self.compute_cost(X,y)
@@ -190,8 +192,8 @@ else:
 
 v = NeuralNet(2,2,2,0.01)
 print(v.compute_cost(X_values, y_values))
-# print(v.fit(X_values, y_values))
+print(v.fit(X_values, y_values))
 print(v.predict(X_values))
-# plot_decision_boundary(v, X_values, y_values)
+plot_decision_boundary(v, X_values, y_values)
             
     

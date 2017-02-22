@@ -181,14 +181,14 @@ def sigmoid(z):
 
 ################################################################################    
 
-X_values = np.genfromtxt('DATA/Linear/X.csv', delimiter=",")
-y_values = np.genfromtxt('DATA/Linear/y.csv', delimiter=",")
+X_values = np.genfromtxt('DATA/NonLinear/X.csv', delimiter=",")
+y_values = np.genfromtxt('DATA/NonLinear/y.csv', delimiter=",")
 #print(y_values[0])
 
 v = LogisticRegression(2,2)
-#print(v.compute_cost(X_values, y_values))
+
+print(v.compute_cost(X_values, y_values))
 print(v.fit(X_values, y_values))
 #print(v.predict(X_values))
 plot_decision_boundary(v, X_values, y_values)
             
-    
