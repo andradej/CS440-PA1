@@ -54,9 +54,11 @@ class LogisticRegression:
         """
         #TODO:
             
-        z = np.dot(np.transpose(self.theta), X) + self.bias
+        z = np.dot(X, self.theta) + self.bias
         exp_z = np.exp(z)
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
+        #print("SOOOFFTTTTOOOO MAAAXXEEEUUUUU DESNU-KA: " + str(softmax_scores))
+        #print(len(softmax_scores))
         
         mean_cost = 0
         errors = 0
@@ -68,7 +70,7 @@ class LogisticRegression:
             else:
                 errors += 1
             
-            cost_for_sample = -np.sum(one_hot_y * np.log(softmax_scores))
+            cost_for_sample = -np.sum(one_hot_y * np.log(softmax_scores[i]))
             
             mean_cost += cost_for_sample
             
@@ -102,49 +104,55 @@ class LogisticRegression:
         """
         Learns model parameters to fit the data.
         """  
-        #TODO:
+        #TODO: 
             
-        learning_rate = 0.1
-        w = 0
-        b = 0
+        current_cost = self.compute_cost(X,y)
+        prev_cost = 0.0
+        difference_of_costs = current_cost - prev_cost
+        convergence_point = 0.0001 #want to be close to 0 since can't actually reach true 0
+        
+        #we loop until costs we are computing are changing minimally
+        # ^ aka we have reached a "convergence"
+        while difference_of_costs >= convergence_point:
             
-        print(X)
-        for i in range(len(X)):
+            #current_cost = self.compute_cost(X,y)
+            
+#            print("Welcome to a new iteration!")
+#            print("current_cost: " + str(current_cost))
+#            print("prev_cost: " + str(prev_cost))
+                        
             #forward propagation
-            z = np.dot(np.transpose(self.theta), X) + self.bias
+            z = np.dot(X, self.theta) + self.bias
             exp_z = np.exp(z)
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
-            
-            #backward propagation: compute the gradient of the cost w.r.t. your weights/biases and update them
-            #dot product of input X with the difference between your predictions (softmax_scores) and the ground truth (one_hot_y)
-            if int(y[i]) == 0:
-                one_hot_y = np.array([1,0])
-            elif int(y[i]) == 1:
-                one_hot_y = np.array([0,1])
                 
-            difference = softmax_scores - one_hot_y
+            differences = []
+            #generating difference matrix
+            for i in range(len(X)):
+                #backward propagation:
+                if int(y[i]) == 0:
+                    one_hot_y = np.array([1,0])
+                elif int(y[i]) == 1:
+                    one_hot_y = np.array([0,1])
+                    
+                difference = softmax_scores[i] - one_hot_y
+                
+                differences.append(difference)
             
-            weight_cost = (y[i] / sigmoid(z)) + ((1-y[i]) / (1-sigmoid(z)))
-            print("weight_cost: " + str(weight_cost))
+            gradient_wrt_weight = np.dot(np.transpose(X), differences)
+            gradient_wrt_bias = np.dot(np.transpose(np.ones((len(X), 1))), differences)
             
-            gradient_wrt_weight = np.dot(X, np.transpose(difference))
+            #w = w - learning_rate * gradient of cost w.r.t weights
+            self.theta = self.theta - 0.001 * gradient_wrt_weight
             
-            gradient_wrt_bias = np.dot(np.ones((len(X), 1)), difference)
+            #b = b - learning_rate * gradient of cost w.r.t. biases
+            self.bias = self.bias - 0.001 * gradient_wrt_bias
             
-            # cost (derivative of cost formula in compute_cost)
-            weight_cost = (y[i] / sigmoid(z)) + ((1-y[i]) / (1-sigmoid(z)))
+            prev_cost = current_cost
+            current_cost = self.compute_cost(X,y)
+            difference_of_costs = abs(current_cost - prev_cost)
             
-            w = w - learning_rate * gradient_wrt_weight
-            b = b - learning_rate * gradient_wrt_bias
-            
-            #print("difference: " + str(difference))
-            #print(gradient_wrt_weight)
-            #print(gradient_wrt_bias)
-            break
-            
-            
-            
-        return 0
+        return self
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -177,9 +185,10 @@ X_values = np.genfromtxt('DATA/Linear/X.csv', delimiter=",")
 y_values = np.genfromtxt('DATA/Linear/y.csv', delimiter=",")
 #print(y_values[0])
 
-v = LogisticRegression(1000,1)
-print(v.compute_cost(X_values, y_values))
+v = LogisticRegression(2,2)
+#print(v.compute_cost(X_values, y_values))
 print(v.fit(X_values, y_values))
 #print(v.predict(X_values))
+plot_decision_boundary(v, X_values, y_values)
             
     
