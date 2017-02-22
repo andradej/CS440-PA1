@@ -180,9 +180,14 @@ def sigmoid(z):
     return 1 / (1 + (np.e ** (-1 * z)))
 
 ################################################################################    
+linear = False
+if linear:
+    X_values = np.genfromtxt('DATA/Linear/X.csv', delimiter=",")
+    y_values = np.genfromtxt('DATA/Linear/y.csv', delimiter=",")
+else:
+    X_values = np.genfromtxt('DATA/NonLinear/X.csv', delimiter=",")
+    y_values = np.genfromtxt('DATA/NonLinear/y.csv', delimiter=",")
 
-X_values = np.genfromtxt('DATA/NonLinear/X.csv', delimiter=",")
-y_values = np.genfromtxt('DATA/NonLinear/y.csv', delimiter=",")
 #print(y_values[0])
 
 v = LogisticRegression(2,2)

@@ -16,7 +16,7 @@ class NeuralNet:
     This class implements a Neural Net
     """
     
-    def __init__(self, input_dim, output_dim, hidden_dim, epsilon):
+    def __init__(self, input_dim, output_dim, hidden_dim, epsilon, lamb):
         """
         Initializes the parameters of the logistic regression classifer to 
         random values.
@@ -35,6 +35,7 @@ class NeuralNet:
         
         #used in gradient descent
         self.epsilon = epsilon
+        self.lamb = lamb
         
     #--------------------------------------------------------------------------
     
@@ -69,6 +70,7 @@ class NeuralNet:
         calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
         
         total_loss = sum(calc_loss)
+        total_loss += self.lamb/2 * (np.sum(np.square(self.theta)) + np.sum(np.square(self.theta_hidden)))
         return 1./len(calc_loss) * total_loss
         
 
@@ -105,35 +107,34 @@ class NeuralNet:
         """  
         #TODO: 
             
-        current_cost = self.compute_cost(X,y)
-        prev_cost = 0.0
-        difference_of_costs = current_cost - prev_cost
-        convergence_point = 0.0001 #want to be close to 0 since can't actually reach true 0
-        
-        #we loop until costs we are computing are changing minimally
-        # ^ aka we have reached a "convergence"
         for i in range(1000):
 
             # forward propogation with hidden layer and tanh activation function
-            z = np.dot(X, self.theta) + self.bias
+            z = np.dot(np.transpose(X), self.theta) + self.bias
             activation = np.tanh(z)
-            z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
+            z_hidden = np.dot(np.transpose(activation), self.theta_hidden) + self.bias_hidden
             exp_z = np.exp(z_hidden)
             #contains probabilities of either 0 or 1 occuring
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
             
             #backward propogation
             delta3 = softmax_scores
-            delta3[range(len(X)), y] -= 1
+            for i in range(len(X)):
+                delta3[i][y.astype(int)] -= 1
+
             dW2 = np.dot(np.transpose(activation), delta3)
             db2 = np.sum(delta3, axis=0, keepdims=True)
             delta2 = np.dot(delta3, np.transpose(self.theta_hidden)) * (1 - np.power(activation,2))
             dW1 = np.dot(np.transpose(X), delta2)
             db1 = np.sum(delta2, axis=0)
+
+            # Regularize weight deltas
+            dW2 += self.lamb * self.theta_hidden
+            dW1 += self.lamb * self.theta
             
             self.theta += -self.epsilon * dW1
             self.bias += -self.epsilon * db1
-            self.theta_bias += -self.epsilon * dW2
+            self.theta_hidden += -self.epsilon * dW2
             self.bias_hidden += -self.epsilon * db2
                     
 #            beta_error = []
@@ -229,10 +230,10 @@ else:
 
 #print(y_values[0])
 
-v = NeuralNet(2,2,2,0.01)
-print(v.compute_cost(X_values, y_values))
-print(v.fit(X_values, y_values))
-print(v.predict(X_values))
+v = NeuralNet(2,2,2,0.01, 0.01)
+# print(v.compute_cost(X_values, y_values))
+# print(v.fit(X_values, y_values))
+# print(v.predict(X_values))
 plot_decision_boundary(v, X_values, y_values)
             
     
