@@ -16,7 +16,7 @@ class NeuralNet:
     This class implements a Neural Net
     """
     
-    def __init__(self, input_dim, output_dim, epsilon):
+    def __init__(self, input_dim, output_dim, hidden_dim, epsilon):
         """
         Initializes the parameters of the logistic regression classifer to 
         random values.
@@ -28,6 +28,12 @@ class NeuralNet:
         
         self.theta = np.random.randn(input_dim, output_dim) / np.sqrt(input_dim)
         self.bias = np.zeros((1, output_dim))
+        
+        # initialize a hidden layer 
+        self.theta_hidden = np.random.randn(hidden_dim, output_dim) / np.sqrt(input_dim)
+        self.bias_hidden = np.zeros((1, hidden_dim))
+        
+        #used in gradient descent
         self.epsilon = epsilon
         
     #--------------------------------------------------------------------------
@@ -41,18 +47,29 @@ class NeuralNet:
             y: Labels corresponding to input data
         
         returns:
-            cost: average cost per data sample
+            cost: average loss per data sample
         """
         #TODO:
-            
+    
         z = np.dot(X, self.theta) + self.bias
-        exp_z = np.exp(z)
+        activation = np.tanh(z)
+        z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
+        exp_z = np.exp(z_hidden)
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
-        # Compute cost for each sample sucka
-        cost_per_sample = -np.log(softmax_scores[range(len(X)), y])
-        cost = np.sum(cost_per_sample)
-        # Return the mean
-        return np.mean(cost)
+        
+        #calculate the cost of each score
+        calc_loss = []
+        for i in range(len(X)):
+            if int(y[i]) == 0:
+                one_hot_y = np.array([1,0])
+            elif int(y[i]) == 1:
+                one_hot_y = np.array([0,1])
+            else:
+                errors += 1
+        calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
+        
+        total_loss = sum(calc_loss)
+        return 1./len(calc_loss) * total_loss
         
 
     
@@ -157,7 +174,7 @@ def sigmoid(z):
 
 ################################################################################    
 
-linear = False
+linear = True
 if linear:
     X_values = np.genfromtxt('DATA/Linear/X.csv', delimiter=",")
     y_values = np.genfromtxt('DATA/Linear/y.csv', delimiter=",")
@@ -168,7 +185,7 @@ else:
 
 #print(y_values[0])
 
-v = NeuralNet(2,2, 0.01)
+v = NeuralNet(2,2,2,0.01)
 print(v.compute_cost(X_values, y_values))
 # print(v.fit(X_values, y_values))
 # #print(v.predict(X_values))
