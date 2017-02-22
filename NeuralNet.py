@@ -26,12 +26,12 @@ class NeuralNet:
             output_dim: Number of classes
         """
         
-        self.theta = np.random.randn(input_dim, output_dim) / np.sqrt(input_dim)
-        self.bias = np.zeros((1, output_dim))
+        self.theta = np.random.randn(input_dim, hidden_dim) / np.sqrt(input_dim)
+        self.bias = np.zeros((1, hidden_dim))
         
         # initialize a hidden layer 
         self.theta_hidden = np.random.randn(hidden_dim, output_dim) / np.sqrt(input_dim)
-        self.bias_hidden = np.zeros((1, hidden_dim))
+        self.bias_hidden = np.zeros((1, output_dim))
         
         #used in gradient descent
         self.epsilon = epsilon
@@ -112,7 +112,7 @@ class NeuralNet:
         
         #we loop until costs we are computing are changing minimally
         # ^ aka we have reached a "convergence"
-        while difference_of_costs >= convergence_point:
+        for i in range(1000):
 
             # forward propogation with hidden layer and tanh activation function
             z = np.dot(X, self.theta) + self.bias
@@ -121,46 +121,73 @@ class NeuralNet:
             exp_z = np.exp(z_hidden)
             #contains probabilities of either 0 or 1 occuring
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
+            
+            #backward propogation
+            delta3 = softmax_scores
+            delta3[range(len(X)), y] -= 1
+            dW2 = np.dot(np.transpose(activation), delta3)
+            db2 = np.sum(delta3, axis=0, keepdims=True)
+            delta2 = np.dot(delta3, np.transpose(self.theta_hidden)) * (1 - np.power(activation,2))
+            dW1 = np.dot(np.transpose(X), delta2)
+            db1 = np.sum(delta2, axis=0)
+            
+            self.theta += -self.epsilon * dW1
+            self.bias += -self.epsilon * db1
+            self.theta_bias += -self.epsilon * dW2
+            self.bias_hidden += -self.epsilon * db2
                     
-            beta_error = []
-            beta_other_nodes = []
-            #generating difference matrix
-            for i in range(len(X)):
-                #backward propagation:
-                if int(y[i]) == 0:
-                    one_hot_y = np.array([1,0])
-                elif int(y[i]) == 1:
-                    one_hot_y = np.array([0,1])
-                
-                # calculate the error: beta = desired - output
-                beta_z = one_hot_y - softmax_scores[i]
-                
-                # calculate for all other nodes: beta_j = output * (1- output)*beta_z
-                beta_j = self.epsilon * softmax_scores[i] * (1-softmax_scores[i]) * beta_z
-                    
-                beta_error.append(beta_z)
-                beta_other_nodes.append(beta_j)
+#            beta_error = []
+#            beta_other_nodes = []
+#            #generating difference matrix
+#            for i in range(len(X)):
+#                #backward propagation:
+#                if int(y[i]) == 0:
+#                    one_hot_y = np.array([1,0])
+#                elif int(y[i]) == 1:
+#                    one_hot_y = np.array([0,1])
+#                
+#                # calculate the error: beta = desired - output
+#                beta_z = one_hot_y - softmax_scores[i]
+#                
+#                # calculate for all other nodes: beta_j = output * (1- output)*beta_z
+#                beta_j = self.epsilon * softmax_scores[i] * (1-softmax_scores[i]) * beta_z
+#                    
+#                beta_error.append(beta_z)
+#                beta_other_nodes.append(beta_j)
                 #differences.append(beta_z)
+                
+#            for i in range(len(softmax_scores)):
+#                beta_h = np.zeros((2, 1))
+#                temp = softmax_scores[i] * (1 - softmax_scores[i]) * beta_error[i]
+#                temp.shape(2, 1)
+#                
+#                beta_h += np.dot(self.theta, temp)
+#                beta_h.shape = (3, )
+#                
+#                x = X[i]
+#                x.shape = (x.shape[0], 1)
+#                h_delta += self.epsilon * x * (beta_j[i]*(1-beta_j[i])*beta_h)
+#                
+#            
+            #print("beta error: " + str(beta_error))
+            #print("beta_other_nodes: " + str(beta_other_nodes))
             
-            print("beta error: " + str(beta_error))
-            print("beta_other_nodes: " + str(beta_other_nodes))
+#            self.theta += np.dot(np.transpose(softmax_scores), beta_other_nodes)
+#            self.theta_hidden += h_delta
+            #print(self.theta)
             
-            self.theta += np.dot(np.transpose(softmax_scores), beta_other_nodes)
-            
-            print(self.theta)
-            
-            gradient_wrt_weight = np.dot(np.transpose(X), differences)
-            gradient_wrt_bias = np.dot(np.transpose(np.ones((len(X), 1))), differences)
-            
-            self.theta_hidden = self.theta_hidden - self.epsilon * gradient_wrt_weight
-            
-            #b = b - learning_rate * gradient of cost w.r.t. biases
-            self.bias = self.bias - self.epsilon * gradient_wrt_bias
-            self.bias_hidden = self.bias_hidden - self.epsilon * gradient_wrt_bias
-            
-            prev_cost = current_cost
-            current_cost = self.compute_cost(X,y)
-            difference_of_costs = abs(current_cost - prev_cost)
+#            gradient_wrt_weight = np.dot(np.transpose(X), differences)
+#            gradient_wrt_bias = np.dot(np.transpose(np.ones((len(X), 1))), differences)
+#            
+#            self.theta_hidden = self.theta_hidden - self.epsilon * gradient_wrt_weight
+#            
+#            #b = b - learning_rate * gradient of cost w.r.t. biases
+#            self.bias = self.bias - self.epsilon * gradient_wrt_bias
+#            self.bias_hidden = self.bias_hidden - self.epsilon * gradient_wrt_bias
+#            
+#            prev_cost = current_cost
+#            current_cost = self.compute_cost(X,y)
+#            difference_of_costs = abs(current_cost - prev_cost)
             
         return self
 
