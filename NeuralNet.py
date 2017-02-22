@@ -85,9 +85,15 @@ class NeuralNet:
         returns:
             predictions: array of predicted labels
         """
-        z = np.dot(X,self.theta) + self.bias
-        exp_z = np.exp(z)
+        # forward propogation with hidden layer and tanh activation function
+        z = np.dot(X, self.theta) + self.bias
+        activation = np.tanh(z)
+        z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
+        exp_z = np.exp(z_hidden)
+        #contains probabilities of either 0 or 1 occuring
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
+        
+        #chooses 0 or 1 based upon the highest probabiity 
         predictions = np.argmax(softmax_scores, axis = 1)
         return predictions
         
@@ -107,18 +113,15 @@ class NeuralNet:
         #we loop until costs we are computing are changing minimally
         # ^ aka we have reached a "convergence"
         while difference_of_costs >= convergence_point:
-            
-            #current_cost = self.compute_cost(X,y)
-            
-#            print("Welcome to a new iteration!")
-#            print("current_cost: " + str(current_cost))
-#            print("prev_cost: " + str(prev_cost))
-                        
-            #forward propagation
+
+            # forward propogation with hidden layer and tanh activation function
             z = np.dot(X, self.theta) + self.bias
-            exp_z = np.exp(z)
+            activation = np.tanh(z)
+            z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
+            exp_z = np.exp(z_hidden)
+            #contains probabilities of either 0 or 1 occuring
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
-                
+                    
             differences = []
             #generating difference matrix
             for i in range(len(X)):
@@ -136,10 +139,10 @@ class NeuralNet:
             gradient_wrt_bias = np.dot(np.transpose(np.ones((len(X), 1))), differences)
             
             #w = w - learning_rate * gradient of cost w.r.t weights
-            self.theta = self.theta - 0.001 * gradient_wrt_weight
+            self.theta = self.theta - self.epsilon * gradient_wrt_weight
             
             #b = b - learning_rate * gradient of cost w.r.t. biases
-            self.bias = self.bias - 0.001 * gradient_wrt_bias
+            self.bias = self.bias - self.epsilon * gradient_wrt_bias
             
             prev_cost = current_cost
             current_cost = self.compute_cost(X,y)
@@ -188,7 +191,7 @@ else:
 v = NeuralNet(2,2,2,0.01)
 print(v.compute_cost(X_values, y_values))
 # print(v.fit(X_values, y_values))
-# #print(v.predict(X_values))
+print(v.predict(X_values))
 # plot_decision_boundary(v, X_values, y_values)
             
     
