@@ -198,10 +198,10 @@ else:
 v = LogisticRegression(2,2)
 
 # print(v.compute_cost(X_values, y_values))
-# print(v.fit(X_values, y_values))
+v.fit(X_values, y_values)
 # # print(v.predict(X_values))
-# plot_decision_boundary(v, X_values, y_values)
-            
+plot_decision_boundary(v, X_values, y_values)
+
 
 # Question 6
 dig = LogisticRegression(64,10)
@@ -217,6 +217,14 @@ y_actual = np.genfromtxt('DATA/Digits/y_test.csv', delimiter=',')
 m = confusion_matrix(y_actual, y_pred)
 print(str(m))
 
+predictions = dig.predict(X_dig)
+correct = 0
 
+for i in range(len(predictions)):
+    if predictions[i] == y_dig[i]: # Check if it was predicted correctly
+        correct += 1
+
+correct /= len(predictions)
+print("Accuracy: " + str(correct * 100) + "%")
 
 
