@@ -165,12 +165,37 @@ We followed the above algorithm for the neural network problem, except we accoun
 
 	<img src="images/difflearningrate.png"> <br> 
 
+	In the above graph, each line represents a different learning rate:
+
+	<ul>
+		<li>red: a learning rate of 0.01</li>
+		<li>blue: a learning rate of 0.1</li>
+		<li>green: a learning rate of 0.2</li>
+
+	</ul>
+
+	<br>
+
+	You can see that with a higher learning rate, it becomes unstable in regards to the accuracy. With a lower learning rate, the cost starts off lower and decreases at time goes on, eventually stabilizing as well. 
+
 	<br><br><br>
 	Question 5: What effect does the number of nodes in the hidden layer have on how your neural network is trained? Illustrate your answer by training your model using different numbers of hidden layer nodes. Provide plots showing the decision boundaries learned by your model for different settings of the number of nodes in the hidden layer. <br><br>
 
 	As we add more nodes to the hidden layer, the neural network becomes more accurate. This is shown in the image below: <br>
 
 	<img src="images/diffnumnodes.png"> <br> 
+
+	In the above graph, each line represents a different amount of nodes in the hidden layer:
+	<ul>
+		<li>red: 5 nodes in the hidden layer</li>
+		<li>blue: 10 nodes in the hidden layer</li>
+		<li>green: 15 nodes in the hidden layer</li>
+
+	</ul>
+
+	<br>
+
+	You can see that with more nodes, the cost over time is much lower than with less nodes, meaning that the system becomes more accurate when you add more nodes to the hidden layer. 
 
 
 </p>
