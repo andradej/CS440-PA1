@@ -296,5 +296,41 @@ for i in range(len(predictions)):
 
 correct /= len(predictions)
 print("Accuracy: " + str(correct * 100) + "%")
-            
+   
+
+def learning_rate_graph(X, y, rate):
+    graph_y = [0] * 5 #number of trials
+    for i in range(len(graph_y)):
+        NN = NeuralNet(2,2,5,rate)
+        NN.fit(X, y)
+        graph_y[i] = NN.compute_cost(X,y)
+        
+    return graph_y
+
+def hidden_nodes_graph(X, y, num_nodes):
+    graph_y = [0] * 10 #number of trials
+    for i in range(len(graph_y)):
+        NN = NeuralNet(2,2,num_nodes,0.01)
+        NN.fit(X, y)
+        graph_y[i] = NN.compute_cost(X,y)
+        
+    return graph_y
+
+#
+x = [x * 1 for x in range(10)]
+#rates = [0.01, 0.1, 0.2]
+#graph_y_first = learning_rate_graph(X_values, y_values, rates[0])
+#graph_y_second = learning_rate_graph(X_values, y_values, rates[1])
+#graph_y_third = learning_rate_graph(X_values, y_values, rates[2])
+#plt.plot(x,graph_y_first,'r--',x,graph_y_second, '--b',x,graph_y_third, '--g')
+#plt.title("different learning rate")
+#plt.show()
+
+num_nodes = [5, 10, 15]
+graph_y_first = hidden_nodes_graph(X_values, y_values, num_nodes[0])
+graph_y_second = hidden_nodes_graph(X_values, y_values, num_nodes[1])
+graph_y_third = hidden_nodes_graph(X_values, y_values, num_nodes[2])
+plt.plot(x, graph_y_first, 'r--',x,graph_y_second, '--b',x,graph_y_third, '--g')
+plt.title("different number of nodes")
+plt.show()         
     
