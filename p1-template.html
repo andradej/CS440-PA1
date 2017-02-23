@@ -48,13 +48,9 @@ width="119" height="120"></a>
 <div class="main-body">
 <hr>
 <h2> Problem Definition </h2>
-<p>
-Give a concise description of current problem. For instance, what
-needs to be solved and why it is useful?  Do you make any assumptions?
-What are the difficulties?
-</p>
 
-<p><b> In this assignment, we are trying to implement both a linear regression classifier and a neural network, and then training those two classes so that they can make informed decisions based on a given input. This is useful for plenty of applications, one being image recognition. You can take a neural network, train it using already classified inputs, and then use that trained neural network to recognize other images. The difficulties really are mostly implementing the actual neural network itself, especially when it comes to having more than one hidden layer. 
+
+<p> In this assignment, we are trying to implement both a linear regression classifier and a neural network, and then training those two classes so that they can make informed decisions based on a given input. This is useful for plenty of applications, one being image recognition. You can take a neural network, train it using already classified inputs, and then use that trained neural network to recognize other images. The difficulties really are mostly implementing the actual neural network itself, especially when it comes to having more than one hidden layer. 
 <br> <br>Here are the learning objectives: <br>
 
 <ol>
@@ -65,24 +61,21 @@ What are the difficulties?
 
 </ol>
 
-</b>
+
 </p>
 
 <hr>
 <h2> Method and Implementation </h2>
-<p>Give a concise description of the implemented method. For example, you might describe the motivation of current idea, the algorithmic steps or any formulation used in current method.
-</p>
-<p><b>My group and I more or less just followed the skeleton code given to us, and the pseudocode that was provided on Piazza. <br><br>
+
+<p>My group and I more or less just followed the skeleton code given to us, and the pseudocode that was provided on Piazza. <br><br>
 For logistic regression classifier, we take in a learning rate and the dimmensions for the input and output. Using that, we were able to implement a cost computing function, and a fit function to recognize patterns from new inputs so that it can be classified based on the trained input. <br><br>
 We followed the above algorithm for the neural network problem, except we accounted for the hidden layer weights and biases. We followed the backwards propagation algorithm that was taught to us in lecture.
 
-</b></p>
-  
-<p>
-Briefly outline the functions you created in your code to carry out your algorithmic steps described above.
 </p>
+  
 
-<p><b>
+
+<p>
 	For the logistic regression classifier:
 
 	<ul>
@@ -96,20 +89,11 @@ Briefly outline the functions you created in your code to carry out your algorit
 
 	For the neural network, it's basically the same functions as above - the implementations have some variation.
 
-</b></p>
+</p>
 
 <hr>
 <h2>Experiments</h2>
-<p>
-Describe your experiments, including the number of tests that you
-performed, and the relevant parameter values.  </p>
-<p>
-Define your evaluation
-metrics, e.g., detection rates, accuracy, running time. </p>
 
-
-<p>
-<b>
 	The first experiment was switching between linear and non linear data for the Logistic Regression Classifier. Here are the results: <br>
 
 	<img src="images/problem1.png">
@@ -156,18 +140,15 @@ metrics, e.g., detection rates, accuracy, running time. </p>
 
 	In both cases, the accuracy was determined by running the predict function on the X_test values (given to us) to get the predicted y values. We then would compare this to the actual y_test values to get an accuracy value.
 
-</b>
+
 </p>
 
 
 <hr>
 <h2> Results</h2>
-<p>
-List your experimental results.  Provide examples of input images and output
-images. If relevant, you may provide images showing any intermediate steps
-</p>
 
-<p><b>
+
+<p>
 	Question 2: Can your logistic regression classifier learn non-linear decision boundaries? Why or why not? <br><br>
 
 	No it can't because the output is determined by a linear function: output = x_input * weights + bias.
@@ -182,54 +163,38 @@ images. If relevant, you may provide images showing any intermediate steps
 
 	Too high of a learning rate will cause the accuracy of the neural network to decline, which is shown below with the following image: <br>
 
+	<img src="images/difflearningrate.png"> <br> 
+
 	<br><br><br>
 	Question 5: What effect does the number of nodes in the hidden layer have on how your neural network is trained? Illustrate your answer by training your model using different numbers of hidden layer nodes. Provide plots showing the decision boundaries learned by your model for different settings of the number of nodes in the hidden layer. <br><br>
 
 	As we add more nodes to the hidden layer, the neural network becomes more accurate. This is shown in the image below: <br>
-	
 
-</b></p>
+
+</p>
 
 <hr>
 <h2> Discussion </h2>
 
-<p> 
-Discuss your method and results:
-<ul>
-<li>What are the strengths and weaknesses of your method? </li>
-<li>Do your results show that your method is generally successful or
-     are there limitations? Describe what you expected to find in your
-     experiments, and how that differed or was confirmed by your
-     results. </li>
-<li>Potential future work. How could your method be improved?   What
-would you try (if you had more time) to overcome the
-failures/limitations of your work?</li> 
-</ul>
+<p> We are fairly satisfied with the accuracy of our neural network, which can be shown below in the case of recognizing digits:<br><br>
+
+<img src="images/digitsNN.png"> <br> 
+
 </p>
 
 <hr>
 <h2> Conclusions </h2>
 
 <p>
-Based on your discussion, what are your conclusions?  What is your
-main message?
+As mentioned above, we are satisfied with the accuracy of our neural network. Our neural network is able to be trained given training data, and from that it's able to determine the class of an input, based on the patterns it has detected from the training data. 
 </p>
 
 
 <hr>
 <h2> Credits and Bibliography </h2>
-<p>
 
-Cite any papers or other references you consulted while developing
-your solution.  Citations to papers should include the authors, the
-year of publication, the title of the work, and the publication
-information (e.g., book name and publisher; conference proceedings and
-location; journal name, volume and pages; technical report and
-institution).  Material on the web should include the url and date of
-access.
-</p>
 
-<p><b>Sources used:
+<p>Sources used:
 
 <ul>
 	<li>http://www.wildml.com/2015/09/implementing-a-neural-network-from-scratch/</li>
@@ -237,11 +202,9 @@ access.
 
 </ul>
 
-</b></p>
-
-<p>
-Credit any joint work or discussions with your classmates. 
 </p>
+
+
 <hr>
 </div>
 </body>
