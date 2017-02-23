@@ -233,7 +233,7 @@ else:
 
 #print(y_values[0])
 
-v = NeuralNet(2,10,2,0.01)
+v = NeuralNet(2,2,10,0.01)
 # print(v.compute_cost(X_values, y_values))
 # print(v.fit(X_values, y_values))
 # print(v.predict(X_values))
@@ -254,6 +254,16 @@ y_actual = np.genfromtxt('DATA/Digits/y_test.csv', delimiter=',')
 
 m = confusion_matrix(y_actual, y_pred)
 print(str(m))
+
+predictions = dig.predict(X_dig)
+correct = 0
+
+for i in range(len(predictions)):
+    if predictions[i] == y_dig[i]: # Check if it was predicted correctly
+        correct += 1
+
+correct /= len(predictions)
+print("Accuracy: " + str(correct * 100) + "%")
 
 predictions = dig.predict(X_dig)
 correct = 0
