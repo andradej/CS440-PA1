@@ -9,14 +9,15 @@ Lab goal: 1) Implement logistic regression classifier
 import numpy as np 
 import matplotlib.pyplot as plt 
 import csv
+from sklearn.metrics import confusion_matrix
 
-
+np.seterr(divide='ignore', invalid='ignore', over='ignore') # https://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
 class NeuralNet:
     """
     This class implements a Neural Net
     """
     
-    def __init__(self, input_dim, output_dim, hidden_dim, epsilon, lamb):
+    def __init__(self, input_dim, output_dim, hidden_dim, epsilon):
         """
         Initializes the parameters of the logistic regression classifer to 
         random values.
@@ -30,12 +31,12 @@ class NeuralNet:
         self.bias = np.zeros((1, hidden_dim))
         
         # initialize a hidden layer 
-        self.theta_hidden = np.random.randn(hidden_dim, output_dim) / np.sqrt(input_dim)
+        self.theta_hidden = np.random.randn(hidden_dim, output_dim) / np.sqrt(hidden_dim)
         self.bias_hidden = np.zeros((1, output_dim))
         
         #used in gradient descent
         self.epsilon = epsilon
-        self.lamb = lamb
+
         
     #--------------------------------------------------------------------------
     
@@ -57,22 +58,26 @@ class NeuralNet:
         z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
         exp_z = np.exp(z_hidden)
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
+        # Calculate the cross-entropy loss
+        cross_ent_err = -np.log(softmax_scores[range(num_samples), y])
+        data_loss = np.sum(cross_ent_err)
+
+        return (1./len(X)) * data_loss
         
         #calculate the cost of each score
-        calc_loss = []
-        for i in range(len(X)):
-            if int(y[i]) == 0:
-                one_hot_y = np.array([1,0])
-            elif int(y[i]) == 1:
-                one_hot_y = np.array([0,1])
-            else:
-                errors += 1
-        calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
+        # calc_loss = []
+        # for i in range(len(X)):
+        #     one_hot_y = np.zeros(self.output_dim)
+        #     one_hot_y[int(y[i])] = 1
+
+        # calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
         
-        total_loss = sum(calc_loss)
-        total_loss += self.lamb/2 * (np.sum(np.square(self.theta)) + np.sum(np.square(self.theta_hidden)))
-        return 1./len(calc_loss) * total_loss
+        # total_loss = sum(calc_loss)
+
+        # return 1./len(calc_loss) * total_loss
         
+
 
     
     #--------------------------------------------------------------------------
@@ -110,9 +115,9 @@ class NeuralNet:
         for i in range(1000):
 
             # forward propogation with hidden layer and tanh activation function
-            z = np.dot(np.transpose(X), self.theta) + self.bias
+            z = np.dot(X, self.theta) + self.bias
             activation = np.tanh(z)
-            z_hidden = np.dot(np.transpose(activation), self.theta_hidden) + self.bias_hidden
+            z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
             exp_z = np.exp(z_hidden)
             #contains probabilities of either 0 or 1 occuring
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
@@ -122,20 +127,18 @@ class NeuralNet:
             for i in range(len(X)):
                 delta3[i][y.astype(int)] -= 1
 
+
             dW2 = np.dot(np.transpose(activation), delta3)
             db2 = np.sum(delta3, axis=0, keepdims=True)
             delta2 = np.dot(delta3, np.transpose(self.theta_hidden)) * (1 - np.power(activation,2))
             dW1 = np.dot(np.transpose(X), delta2)
             db1 = np.sum(delta2, axis=0)
 
-            # Regularize weight deltas
-            dW2 += self.lamb * self.theta_hidden
-            dW1 += self.lamb * self.theta
             
-            self.theta += -self.epsilon * dW1
-            self.bias += -self.epsilon * db1
-            self.theta_hidden += -self.epsilon * dW2
-            self.bias_hidden += -self.epsilon * db2
+            self.theta -= self.epsilon * dW1
+            self.bias -= self.epsilon * db1
+            self.theta_hidden -= self.epsilon * dW2
+            self.bias_hidden -= self.epsilon * db2
                     
 #            beta_error = []
 #            beta_other_nodes = []
@@ -219,7 +222,7 @@ def sigmoid(z):
 
 ################################################################################    
 
-linear = True
+linear = False
 if linear:
     X_values = np.genfromtxt('DATA/Linear/X.csv', delimiter=",")
     y_values = np.genfromtxt('DATA/Linear/y.csv', delimiter=",")
@@ -230,10 +233,30 @@ else:
 
 #print(y_values[0])
 
-v = NeuralNet(2,2,2,0.01, 0.01)
+v = NeuralNet(2,10,2,0.01)
 # print(v.compute_cost(X_values, y_values))
 # print(v.fit(X_values, y_values))
 # print(v.predict(X_values))
-plot_decision_boundary(v, X_values, y_values)
+# v.fit(X_values, y_values)
+# plot_decision_boundary(v, X_values, y_values)
+
+
+# Question 7
+
+
+dig = NeuralNet(64, 10, 10, 0.01)
+X_dig = np.genfromtxt('DATA/Digits/X_train.csv', delimiter=",")
+y_dig = np.genfromtxt('DATA/Digits/y_train.csv', delimiter=",")
+
+dig.fit(X_dig, y_dig)
+
+X = np.genfromtxt('DATA/Digits/X_test.csv', delimiter=',')
+y_pred = dig.predict(X)
+y_actual = np.genfromtxt('DATA/Digits/y_test.csv', delimiter=',')
+
+m = confusion_matrix(y_actual, y_pred)
+print(str(m))
+
+
             
     

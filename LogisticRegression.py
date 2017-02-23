@@ -9,6 +9,7 @@ Lab goal: 1) Implement logistic regression classifier
 import numpy as np 
 import matplotlib.pyplot as plt 
 import csv
+from sklearn.metrics import confusion_matrix
 '''
 with open('DATA/Linear/y.csv', 'r') as f:
     reader = csv.reader(f, delimiter=",")
@@ -38,6 +39,8 @@ class LogisticRegression:
         
         self.theta = np.random.randn(input_dim, output_dim) / np.sqrt(input_dim)
         self.bias = np.zeros((1, output_dim))
+        self.input_dim = input_dim
+        self.output_dim = output_dim
         
     #--------------------------------------------------------------------------
     
@@ -61,14 +64,9 @@ class LogisticRegression:
         #print(len(softmax_scores))
         
         mean_cost = 0
-        errors = 0
         for i in range(len(X)):
-            if int(y[i]) == 0:
-                one_hot_y = np.array([1,0])
-            elif int(y[i]) == 1:
-                one_hot_y = np.array([0,1])
-            else:
-                errors += 1
+            one_hot_y = np.zeros(self.output_dim)
+            one_hot_y[int(y[i])] = 1
             
             cost_for_sample = -np.sum(one_hot_y * np.log(softmax_scores[i]))
             
@@ -92,7 +90,7 @@ class LogisticRegression:
         returns:
             predictions: array of predicted labels
         """
-        z = np.dot(X,self.theta) + self.bias
+        z = np.dot(X, self.theta) + self.bias
         exp_z = np.exp(z)
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
         predictions = np.argmax(softmax_scores, axis = 1)
@@ -127,13 +125,20 @@ class LogisticRegression:
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
                 
             differences = []
+
             #generating difference matrix
             for i in range(len(X)):
+                one_hot_y = np.zeros(self.output_dim)
+                one_hot_y[int(y[i])] = 1
+
+
                 #backward propagation:
-                if int(y[i]) == 0:
-                    one_hot_y = np.array([1,0])
-                elif int(y[i]) == 1:
-                    one_hot_y = np.array([0,1])
+                # if int(y[i]) == 0:
+                #     one_hot_y = np.array([1,0])
+                # elif int(y[i]) == 1:
+                #     one_hot_y = np.array([0,1])
+
+
                     
                 difference = softmax_scores[i] - one_hot_y
                 
@@ -180,7 +185,7 @@ def sigmoid(z):
     return 1 / (1 + (np.e ** (-1 * z)))
 
 ################################################################################    
-linear = False
+linear = True
 if linear:
     X_values = np.genfromtxt('DATA/Linear/X.csv', delimiter=",")
     y_values = np.genfromtxt('DATA/Linear/y.csv', delimiter=",")
@@ -192,8 +197,26 @@ else:
 
 v = LogisticRegression(2,2)
 
-print(v.compute_cost(X_values, y_values))
-print(v.fit(X_values, y_values))
-#print(v.predict(X_values))
-plot_decision_boundary(v, X_values, y_values)
+# print(v.compute_cost(X_values, y_values))
+# print(v.fit(X_values, y_values))
+# # print(v.predict(X_values))
+# plot_decision_boundary(v, X_values, y_values)
             
+
+# Question 6
+dig = LogisticRegression(64,10)
+X_dig = np.genfromtxt('DATA/Digits/X_train.csv', delimiter=",")
+y_dig = np.genfromtxt('DATA/Digits/y_train.csv', delimiter=",")
+
+dig.fit(X_dig, y_dig)
+
+X = np.genfromtxt('DATA/Digits/X_test.csv', delimiter=',')
+y_pred = dig.predict(X)
+y_actual = np.genfromtxt('DATA/Digits/y_test.csv', delimiter=',')
+
+m = confusion_matrix(y_actual, y_pred)
+print(str(m))
+
+
+
+
