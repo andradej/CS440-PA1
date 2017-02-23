@@ -25,6 +25,8 @@ class NeuralNet:
         args:
             input_dim: Number of dimensions of the input data
             output_dim: Number of classes
+            hidden_dim: Number of nodes in the hidden layer
+            epsilon: learning rate
         """
         
         self.theta = np.random.randn(input_dim, hidden_dim) / np.sqrt(input_dim)
@@ -58,29 +60,10 @@ class NeuralNet:
         exp_z = np.exp(z_hidden)
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
 
-        # Calculate the cross-entropy loss
-        cross_ent_err = -np.log(softmax_scores[range(len(X)), y.astype('int64')])
-        data_loss = np.sum(cross_ent_err)
-        return 1./len(X) * data_loss
-#
-#        return (1./len(X)) * data_loss
-        
-        #calculate the cost of each score
-#        calc_loss = []
-#        for i in range(len(X)):
-#            one_hot_y = np.zeros(len(X[0]))
-#            one_hot_y[int(y[i])] = 1
-#            
-##            print(one_hot_y)
-##            print(softmax_scores[i])
-#            calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
-#        
-#        total_loss = sum(calc_loss)
-#        
-#        return 1./len(calc_loss) * total_loss
-
-
-
+        # Calculate the cost per point and then return the average cost
+        cost_per_point = -np.log(softmax_scores[range(len(X)), y.astype('int64')])
+        total_loss = np.sum(cost_per_point)
+        return 1./len(X) * total_loss
     
     #--------------------------------------------------------------------------
  
@@ -136,86 +119,6 @@ class NeuralNet:
             self.bias -= self.epsilon * db1
             self.theta_hidden -= self.epsilon * dw2
             self.bias_hidden -= self.epsilon * db2
-#        for i in range(1000):
-#
-#            # forward propogation with hidden layer and tanh activation function
-#            z = np.dot(X, self.theta) + self.bias
-#            activation = np.tanh(z)
-#            z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
-#            exp_z = np.exp(z_hidden)
-#            #contains probabilities of either 0 or 1 occuring
-#            softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
-#            
-#            #backward propogation
-#            delta3 = softmax_scores
-#            for i in range(len(X)):
-#                delta3[i][y.astype(int)] -= 1
-#
-#
-#            dW2 = np.dot(np.transpose(activation), delta3)
-#            db2 = np.sum(delta3, axis=0, keepdims=True)
-#            delta2 = np.dot(delta3, np.transpose(self.theta_hidden)) * (1 - np.power(activation,2))
-#            dW1 = np.dot(np.transpose(X), delta2)
-#            db1 = np.sum(delta2, axis=0)
-#
-#            
-#            self.theta -= self.epsilon * dW1
-#            self.bias -= self.epsilon * db1
-#            self.theta_hidden -= self.epsilon * dW2
-#            self.bias_hidden -= self.epsilon * db2
-                    
-#            beta_error = []
-#            beta_other_nodes = []
-#            #generating difference matrix
-#            for i in range(len(X)):
-#                #backward propagation:
-#                if int(y[i]) == 0:
-#                    one_hot_y = np.array([1,0])
-#                elif int(y[i]) == 1:
-#                    one_hot_y = np.array([0,1])
-#                
-#                # calculate the error: beta = desired - output
-#                beta_z = one_hot_y - softmax_scores[i]
-#                
-#                # calculate for all other nodes: beta_j = output * (1- output)*beta_z
-#                beta_j = self.epsilon * softmax_scores[i] * (1-softmax_scores[i]) * beta_z
-#                    
-#                beta_error.append(beta_z)
-#                beta_other_nodes.append(beta_j)
-                #differences.append(beta_z)
-                
-#            for i in range(len(softmax_scores)):
-#                beta_h = np.zeros((2, 1))
-#                temp = softmax_scores[i] * (1 - softmax_scores[i]) * beta_error[i]
-#                temp.shape(2, 1)
-#                
-#                beta_h += np.dot(self.theta, temp)
-#                beta_h.shape = (3, )
-#                
-#                x = X[i]
-#                x.shape = (x.shape[0], 1)
-#                h_delta += self.epsilon * x * (beta_j[i]*(1-beta_j[i])*beta_h)
-#                
-#            
-            #print("beta error: " + str(beta_error))
-            #print("beta_other_nodes: " + str(beta_other_nodes))
-            
-#            self.theta += np.dot(np.transpose(softmax_scores), beta_other_nodes)
-#            self.theta_hidden += h_delta
-            #print(self.theta)
-            
-#            gradient_wrt_weight = np.dot(np.transpose(X), differences)
-#            gradient_wrt_bias = np.dot(np.transpose(np.ones((len(X), 1))), differences)
-#            
-#            self.theta_hidden = self.theta_hidden - self.epsilon * gradient_wrt_weight
-#            
-#            #b = b - learning_rate * gradient of cost w.r.t. biases
-#            self.bias = self.bias - self.epsilon * gradient_wrt_bias
-#            self.bias_hidden = self.bias_hidden - self.epsilon * gradient_wrt_bias
-#            
-#            prev_cost = current_cost
-#            current_cost = self.compute_cost(X,y)
-#            difference_of_costs = abs(current_cost - prev_cost)
             
         return self
 
@@ -248,10 +151,6 @@ def plot_decision_boundary(model, X, y):
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.bwr)
     plt.show()
 
-# helper function sigmoid to determine the cost
-def sigmoid(z):
-    return 1 / (1 + (np.e ** (-1 * z)))
-
 ################################################################################    
 
 linear = True
@@ -272,7 +171,7 @@ v = NeuralNet(2,2,10,0.01)
 v.fit(X_values, y_values)
 plot_decision_boundary(v, X_values, y_values)
 
-
+################################################################################    
 # Question 7
 dig = NeuralNet(64, 10, 10, 0.01)
 X_dig = np.genfromtxt('DATA/Digits/X_train.csv', delimiter=",")
@@ -287,6 +186,9 @@ y_actual = np.genfromtxt('DATA/Digits/y_test.csv', delimiter=',')
 m = confusion_matrix(y_actual, y_pred)
 print(str(m))
 
+################################################################################    
+
+
 predictions = dig.predict(X_dig)
 correct = 0
 
@@ -296,8 +198,9 @@ for i in range(len(predictions)):
 
 correct /= len(predictions)
 print("Accuracy: " + str(correct * 100) + "%")
-   
+################################################################################    
 
+# Question 4
 def learning_rate_graph(X, y, rate):
     graph_y = [0] * 5 #number of trials
     for i in range(len(graph_y)):
@@ -307,6 +210,7 @@ def learning_rate_graph(X, y, rate):
         
     return graph_y
 
+# Question 5
 def hidden_nodes_graph(X, y, num_nodes):
     graph_y = [0] * 10 #number of trials
     for i in range(len(graph_y)):
@@ -316,7 +220,7 @@ def hidden_nodes_graph(X, y, num_nodes):
         
     return graph_y
 
-#
+# The code below is to graph costs 
 x = [x * 1 for x in range(10)]
 #rates = [0.01, 0.1, 0.2]
 #graph_y_first = learning_rate_graph(X_values, y_values, rates[0])

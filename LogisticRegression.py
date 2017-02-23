@@ -112,12 +112,6 @@ class LogisticRegression:
         #we loop until costs we are computing are changing minimally
         # ^ aka we have reached a "convergence"
         while difference_of_costs >= convergence_point:
-            
-            #current_cost = self.compute_cost(X,y)
-            
-#            print("Welcome to a new iteration!")
-#            print("current_cost: " + str(current_cost))
-#            print("prev_cost: " + str(prev_cost))
                         
             #forward propagation
             z = np.dot(X, self.theta) + self.bias
@@ -130,15 +124,6 @@ class LogisticRegression:
             for i in range(len(X)):
                 one_hot_y = np.zeros(self.output_dim)
                 one_hot_y[int(y[i])] = 1
-
-
-                #backward propagation:
-                # if int(y[i]) == 0:
-                #     one_hot_y = np.array([1,0])
-                # elif int(y[i]) == 1:
-                #     one_hot_y = np.array([0,1])
-
-
                     
                 difference = softmax_scores[i] - one_hot_y
                 
@@ -180,9 +165,6 @@ def plot_decision_boundary(model, X, y):
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.bwr)
     plt.show()
 
-# helper function sigmoid to determine the cost
-def sigmoid(z):
-    return 1 / (1 + (np.e ** (-1 * z)))
 
 ################################################################################    
 linear = True
@@ -202,7 +184,7 @@ v.fit(X_values, y_values)
 # # print(v.predict(X_values))
 plot_decision_boundary(v, X_values, y_values)
 
-
+################################################################################    
 # Question 6
 dig = LogisticRegression(64,10)
 X_dig = np.genfromtxt('DATA/Digits/X_train.csv', delimiter=",")
@@ -217,6 +199,7 @@ y_actual = np.genfromtxt('DATA/Digits/y_test.csv', delimiter=',')
 m = confusion_matrix(y_actual, y_pred)
 print(str(m))
 
+################################################################################    
 predictions = dig.predict(X_dig)
 correct = 0
 
