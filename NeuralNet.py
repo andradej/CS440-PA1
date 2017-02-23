@@ -52,31 +52,33 @@ class NeuralNet:
             cost: average loss per data sample
         """
         #TODO:
-    
         z = np.dot(X, self.theta) + self.bias
-        activation = np.tanh(z)
+        activation = sigmoid(z)
         z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
         exp_z = np.exp(z_hidden)
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
 
         # Calculate the cross-entropy loss
-        cross_ent_err = -np.log(softmax_scores[range(num_samples), y])
+        cross_ent_err = -np.log(softmax_scores[range(len(X)), y.astype('int64')])
         data_loss = np.sum(cross_ent_err)
-
-        return (1./len(X)) * data_loss
+        return 1./len(X) * data_loss
+#
+#        return (1./len(X)) * data_loss
         
         #calculate the cost of each score
-        # calc_loss = []
-        # for i in range(len(X)):
-        #     one_hot_y = np.zeros(self.output_dim)
-        #     one_hot_y[int(y[i])] = 1
+#        calc_loss = []
+#        for i in range(len(X)):
+#            one_hot_y = np.zeros(len(X[0]))
+#            one_hot_y[int(y[i])] = 1
+#            
+##            print(one_hot_y)
+##            print(softmax_scores[i])
+#            calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
+#        
+#        total_loss = sum(calc_loss)
+#        
+#        return 1./len(calc_loss) * total_loss
 
-        # calc_loss.append(-np.sum(one_hot_y * np.log(softmax_scores[i])))
-        
-        # total_loss = sum(calc_loss)
-
-        # return 1./len(calc_loss) * total_loss
-        
 
 
     
@@ -94,12 +96,12 @@ class NeuralNet:
         """
         # forward propogation with hidden layer and tanh activation function
         z = np.dot(X, self.theta) + self.bias
-        activation = np.tanh(z)
+        activation = sigmoid(z)
         z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
         exp_z = np.exp(z_hidden)
         #contains probabilities of either 0 or 1 occuring
         softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
-        
+    
         #chooses 0 or 1 based upon the highest probabiity 
         predictions = np.argmax(softmax_scores, axis = 1)
         return predictions
@@ -112,33 +114,55 @@ class NeuralNet:
         """  
         #TODO: 
             
-        for i in range(1000):
-
-            # forward propogation with hidden layer and tanh activation function
-            z = np.dot(X, self.theta) + self.bias
-            activation = np.tanh(z)
-            z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
-            exp_z = np.exp(z_hidden)
-            #contains probabilities of either 0 or 1 occuring
+        for i in range(0,5000):
+            # Do Forward propagation to calculate our predictions
+            z1 = X.dot(self.theta) + self.bias
+            a1 = sigmoid(z1)
+            z2 = a1.dot(self.theta_hidden) + self.bias_hidden
+            exp_z = np.exp(z2)
             softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
             
-            #backward propogation
+            # Back Propagation
             delta3 = softmax_scores
-            for i in range(len(X)):
-                delta3[i][y.astype(int)] -= 1
-
-
-            dW2 = np.dot(np.transpose(activation), delta3)
-            db2 = np.sum(delta3, axis=0, keepdims=True)
-            delta2 = np.dot(delta3, np.transpose(self.theta_hidden)) * (1 - np.power(activation,2))
-            dW1 = np.dot(np.transpose(X), delta2)
-            db1 = np.sum(delta2, axis=0)
-
+            delta3[range(len(X)), y.astype('int64')] -= 1
+            dw2 = (a1.T).dot(delta3) 
+            db2 = np.sum(delta3, axis = 0, keepdims = True)
+            delta2 = delta3.dot(self.theta_hidden.T) * sigmoidPrime(z1)
+            dw1 = np.dot(X.T, delta2)
+            db1 = np.sum(delta2, axis = 0)
             
-            self.theta -= self.epsilon * dW1
+            # Gradient descent parameter uqdate
+            self.theta -= self.epsilon * dw1
             self.bias -= self.epsilon * db1
-            self.theta_hidden -= self.epsilon * dW2
+            self.theta_hidden -= self.epsilon * dw2
             self.bias_hidden -= self.epsilon * db2
+#        for i in range(1000):
+#
+#            # forward propogation with hidden layer and tanh activation function
+#            z = np.dot(X, self.theta) + self.bias
+#            activation = np.tanh(z)
+#            z_hidden = np.dot(activation, self.theta_hidden) + self.bias_hidden
+#            exp_z = np.exp(z_hidden)
+#            #contains probabilities of either 0 or 1 occuring
+#            softmax_scores = exp_z / np.sum(exp_z, axis=1, keepdims=True)
+#            
+#            #backward propogation
+#            delta3 = softmax_scores
+#            for i in range(len(X)):
+#                delta3[i][y.astype(int)] -= 1
+#
+#
+#            dW2 = np.dot(np.transpose(activation), delta3)
+#            db2 = np.sum(delta3, axis=0, keepdims=True)
+#            delta2 = np.dot(delta3, np.transpose(self.theta_hidden)) * (1 - np.power(activation,2))
+#            dW1 = np.dot(np.transpose(X), delta2)
+#            db1 = np.sum(delta2, axis=0)
+#
+#            
+#            self.theta -= self.epsilon * dW1
+#            self.bias -= self.epsilon * db1
+#            self.theta_hidden -= self.epsilon * dW2
+#            self.bias_hidden -= self.epsilon * db2
                     
 #            beta_error = []
 #            beta_other_nodes = []
@@ -198,6 +222,14 @@ class NeuralNet:
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+def sigmoid(z):
+        #Apply sigmoid activation function to scalar, vector, or matrix
+        return 1/(1+np.exp(-z))
+    
+def sigmoidPrime(z):
+        #Gradient of sigmoid
+        return np.exp(-z)/((1+np.exp(-z))**2)
+    
 def plot_decision_boundary(model, X, y):
     """
     Function to print the decision boundary given by model.
@@ -234,8 +266,8 @@ else:
 #print(y_values[0])
 
 v = NeuralNet(2,2,10,0.01)
-# print(v.compute_cost(X_values, y_values))
-# print(v.fit(X_values, y_values))
+#print(v.compute_cost(X_values, y_values))
+
 # print(v.predict(X_values))
 v.fit(X_values, y_values)
 plot_decision_boundary(v, X_values, y_values)
@@ -264,15 +296,41 @@ for i in range(len(predictions)):
 
 correct /= len(predictions)
 print("Accuracy: " + str(correct * 100) + "%")
+   
 
-predictions = dig.predict(X_dig)
-correct = 0
+def learning_rate_graph(X, y, rate):
+    graph_y = [0] * 5 #number of trials
+    for i in range(len(graph_y)):
+        NN = NeuralNet(2,2,5,rate)
+        NN.fit(X, y)
+        graph_y[i] = NN.compute_cost(X,y)
+        
+    return graph_y
 
-for i in range(len(predictions)):
-    if predictions[i] == y_dig[i]: # Check if it was predicted correctly
-        correct += 1
+def hidden_nodes_graph(X, y, num_nodes):
+    graph_y = [0] * 10 #number of trials
+    for i in range(len(graph_y)):
+        NN = NeuralNet(2,2,num_nodes,0.01)
+        NN.fit(X, y)
+        graph_y[i] = NN.compute_cost(X,y)
+        
+    return graph_y
 
-correct /= len(predictions)
-print("Accuracy: " + str(correct * 100) + "%")
-            
+#
+x = [x * 1 for x in range(10)]
+#rates = [0.01, 0.1, 0.2]
+#graph_y_first = learning_rate_graph(X_values, y_values, rates[0])
+#graph_y_second = learning_rate_graph(X_values, y_values, rates[1])
+#graph_y_third = learning_rate_graph(X_values, y_values, rates[2])
+#plt.plot(x,graph_y_first,'r--',x,graph_y_second, '--b',x,graph_y_third, '--g')
+#plt.title("different learning rate")
+#plt.show()
+
+num_nodes = [5, 10, 15]
+graph_y_first = hidden_nodes_graph(X_values, y_values, num_nodes[0])
+graph_y_second = hidden_nodes_graph(X_values, y_values, num_nodes[1])
+graph_y_third = hidden_nodes_graph(X_values, y_values, num_nodes[2])
+plt.plot(x, graph_y_first, 'r--',x,graph_y_second, '--b',x,graph_y_third, '--g')
+plt.title("different number of nodes")
+plt.show()         
     
