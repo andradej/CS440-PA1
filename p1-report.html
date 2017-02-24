@@ -1,0 +1,231 @@
+
+<html>
+<head>
+<title> CS440/640 HW1 Joseph Cho  </title>
+<style>
+<!--
+body{
+font-family: 'Trebuchet MS', Verdana;
+}
+p{
+font-family: 'Trebuchet MS', Times;
+margin: 10px 10px 15px 20px;
+}
+h3{
+margin: 5px;
+}
+h2{
+margin: 10px;
+}
+h1{
+margin: 10px 0px 0px 20px;
+}
+div.main-body{
+align:center;
+margin: 30px;
+}
+hr{
+margin:20px 0px 20px 0px;
+}
+-->
+</style>
+</head>
+
+<body>
+<center>
+<a href="http://www.bu.edu"><img border="0" src="http://www.cs.bu.edu/fac/betke/images/bu-logo.gif"
+width="119" height="120"></a>
+</center>
+
+<h1>Logistic Regression and Neural Networks</h1>
+<p> 
+ Joseph Cho<br>
+ Jackie Andrade<br>Pauline Ramirez<br>
+    February 22, 2017
+</p>
+
+<div class="main-body">
+<hr>
+<h2> Problem Definition </h2>
+
+<!-- Give a concise description of current problem. For instance, what needs to be solved and why it is useful? Do you make any assumptions? What are the difficulties? -->
+
+<p> The purpose of this assignment was to implement our own Python versions of logistic regression classifier and neural network classes that can make decisions about input datasets based upon training that our classes received. Specifically we wanted to train our classes so that they could successfully process images of numbers, a direct application of our Python classes. 
+
+Learning about the inner workings of these classes is important because, if implemented correctly and properly trained, both a logistic regression classifer and a neural network can be very powerful tools to efficiently process data for many different applications. 
+<br> <br>Difficulties Faced: <br>
+<ol>
+	<li>Trying to gain an understanding of logistic regression and neural networks on a fundamental level.</li>
+	<li>Translating the high-level visual representation of the problem on paper into actual code.</li>
+	<li>Understanding the interaction of all the different components of logistic regression and neural networks.</li>
+	<li>Understanding the metrics to classify the accuracy of our systems</li>
+</ol>
+
+</p>
+
+<hr>
+<h2> Method and Implementation </h2>
+
+<!-- Give a concise description of the implemented method. For example, you might describe the motivation of current idea, the algorithmic steps or any formulation used in current method.
+
+Briefly outline the functions you created in your code to carry out your algorithmic steps described above. -->
+
+<p>Our group mostly referred to the notes provided in our lab section and psuedo code provided on piazza. When implementing logistic regression we played around with a learning rate and passed in input and output dimmensions as parameters. We implemented a cost computation function, and a "fit" function that analyzes inputs to identify patterns so that inputs can be classified based on a "training input." <br><br>
+The logic for implementing our neural network was mostly similar to that of our logistic regression classifier, but we did have to account for additional fields and parameters to represent the "hidden layer" of weights and biases:
+    <ul>
+        <li>Perform forward propagation to calculate our predictions</li>
+        <li>Perform backward propagation to calculate gradients</li>
+        <li>Update the parameters and evaluate</li>
+        <li>Repeat the above steps to reach a point of convergence</li>
+    </ul>
+
+
+    <p>
+    	Functions in logistic regression classifier:
+
+    	<ul>
+    		<li>init: Initializes the parameters of the logistic regression classifer to random values. Takes in the number of dimensions of the input data, and the number of classes in the output data.</li>
+    		<li>compute_cost: Computes the average cost of the data set. Takes in the data array and labels corresponding to input data.</li>
+    		<li>predict: Makes a prediction based on current model parameters. Takes in the data array.</li>
+    		<li>fit: Learns model parameters to fit the data. Takes in the data array and labels corresponding to input data.</li>
+    	</ul>
+    </p>
+
+    <p>
+        Functions in neural network are generally the same as those in the logistic regression classifier with slight modifications to account for a hidden layer.
+    </p>
+
+</p>
+
+<hr>
+<h2>Experiments</h2>
+
+    <h4>Experiment 1</h4>
+
+	Switching between linear and non linear data for the Logistic Regression Classifier. <br>
+
+    Result for linear dataset: 
+    <br>
+	<img src="images/problem1.png">
+
+	<br><br><br>
+
+	Result for non-linear dataset:
+	<br>
+	<img src="images/problem1nonlinear.png">
+
+	<br>
+
+    <h4>Experiment 2</h4>
+
+	Change the number of nodes in the hidden layer for the Neural Network class.
+    <br> 
+    Result of having 2 nodes: <br>
+
+
+	<img src="images/p32nodesfinal.png"> <br>
+
+	Result of having 10 nodes: <br>
+
+	<img src="images/p310nodesfinal.png"> <br>
+
+	<br><br><br>
+
+    <h4>Experiment 3</h4>
+
+	Trying linear and nonlinear datasets for the neutral network using 10 nodes. The results for using a linear dataset are the same as the previous image. <br>
+
+	<img src="images/p310nodesfinal.png"> <br>
+
+	Results using nonlinear data with a 10-node hidden layer: <br>
+
+	<img src="images/p3nonlinear10nodes.png"> <br> 
+
+	<br><br><br>
+
+    <h4>Additional Experiments</h4>
+
+	Training the Logistic Regression classifier to recognize digits, the confusion matrix and accuracy below: <br><br>
+
+
+	<img src="images/digitsLR.png"> <br><br>
+
+    Results using a 10-node hidden layer neural network:<br><br>
+
+	<img src="images/digitsNN.png"> <br> 
+
+	In both cases, the predict function was used on the X_test values (given) to get the predicted y values. Then, the predicted y values were compared to the actual y_test values to calculate an accuracy value 
+
+</p>
+
+
+<hr>
+<h2> Results</h2>
+
+
+<p>
+	Question 2: Can your logistic regression classifier learn non-linear decision boundaries? Why or why not? <br><br>
+
+	No. The output is determined by a linear function: output = x_input * weights + bias.
+
+	<br><br><br>
+	Question 3: Can your neural network model (with one hidden layer) learn non-linear decision boundaries? Why or why not? <br><br>
+
+	Yes. The output is determined by a nonlinear activation function, the sigmoid function. So our neural network is not limited to linear data.
+
+	<br><br><br>
+	Question 4: What effect does learning rate have on how your neural network is trained? Illustrate your answer by training your model using different learning rates. Provide plots illustrating the total cost of your model over time for different settings of the learning rate. <br><br>
+
+	If the learning rate is too high it will cause the accuracy of the neural network to decline, shown below: <br>
+
+	<img src="images/difflearningrate.png"> <br> 
+
+	<br><br><br>
+	Question 5: What effect does the number of nodes in the hidden layer have on how your neural network is trained? Illustrate your answer by training your model using different numbers of hidden layer nodes. Provide plots showing the decision boundaries learned by your model for different settings of the number of nodes in the hidden layer. <br><br>
+
+	As we add more nodes to the hidden layer, the neural network becomes more accurate. This is shown in the image below: <br>
+
+	<img src="images/diffnumnodes.png"> <br> 
+
+
+</p>
+
+<hr>
+<h2> Discussion </h2>
+
+<p> We are fairly satisfied with the accuracy of our neural network, which can be shown below in the case of recognizing digits:<br><br>
+
+<img src="images/digitsNN.png"> <br> 
+
+</p>
+
+<hr>
+<h2> Conclusions </h2>
+
+<p>
+As stated above, we are satisfied with the accuracy of our neural network. Given training data, our neural network succeeds in being "trained" and is then able to use the patterns it detects from a training dataset to determine the class of a point in an input dataset.
+</p>
+
+
+<hr>
+<h2> Credits and Bibliography </h2>
+
+
+<p>Sources used:
+
+<ul>
+	<li>http://www.wildml.com/2015/09/implementing-a-neural-network-from-scratch/</li>
+	<li> http://www.kdnuggets.com/2016/10/beginners-guide-neural-networks-python-scikit-learn.html </li>
+
+</ul>
+
+</p>
+
+
+<hr>
+</div>
+</body>
+
+
+
+</html>
